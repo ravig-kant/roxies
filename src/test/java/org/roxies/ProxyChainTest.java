@@ -66,16 +66,21 @@ public class ProxyChainTest {
 
         echoServerThread.execute(new Runnable() {
             public void run() {
-                Route route = new ChainedRoute();
-                route.addStop(new InetSocketAddress("127.0.0.1", 50352));
-                route.addStop(new InetSocketAddress("127.0.0.1", 50353));
-                ApplicationContext.currentContext().getFactory().addRoute("defaultRoute", route);
                 proxyServer = new Server();
-                proxyServer.start(8081,null);
-
+                proxyServer.start(8081, null);
             }
         });
 
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(ProxyChainTest.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        Route route = new ChainedRoute();
+        route.addStop(new InetSocketAddress("127.0.0.1", 50352));
+        route.addStop(new InetSocketAddress("127.0.0.1", 50353));
+        ApplicationContext.currentContext().getFactory().addRoute("defaultRoute", route);
         ServerAuthenticator auth = new ServerAuthenticatorNone();
 
         pServer1 = new ProxyServer(auth);
